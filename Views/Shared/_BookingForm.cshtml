@@ -1,0 +1,62 @@
+﻿@model Car_Rental_System.ViewModel.HomeViewModel
+
+
+<div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-header justify-content-center bg-image fs-5 fw-bolder">
+            <h5 class="modal-title" id="addVehicleModalLabel align-text-center ">Rent Vehicle</h5>
+        </div>
+        <div class="modal-body overflow-auto" style="max-height: 750px">
+            <div class="back-color">
+                <form class="px-5 pt-5">
+                    <div class="form-group">
+                        <label asp-for="@Model.Transport.VehicleModelName" class="mb-3 fs-5 fw-bolder"></label>
+                        <input asp-for="@Model.Transport.VehicleModelName" type="text" class="form-control mb-3 fw-bold" id="vehicleModel" disabled>
+                    </div>
+                    <div class="form-row d-flex justify-content-between">
+                        <div class="form-group col-md-5" style="margin-right : 20px;">
+                            <label class="mb-3 fs-5 fw-bolder">Accomodate Person</label>
+                            <input asp-for="@Model.Transport.VehicleCapacity" class="form-control mb-2 fw-bold" id="vehicleCapacity" disabled />
+
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label  class="mb-3 fs-5 fw-bolder">Available Now</label>
+                            <input asp-for="@Model.Transport.AvailableQuantity" class="form-control mb-2 fw-bold" id="totalQuantity" disabled />
+                        </div>
+                    </div>
+                    <div class="form-row d-flex justify-content-between">
+                        <div class="form-group col-md-5" style="margin-right : 20px;">
+                            <label asp-for="@Model.BookCar.StartDate" class="mb-3 fs-5 fw-bolder"></label>
+                            <input asp-for="@Model.BookCar.StartDate" type="date" class="form-control mb-3" id="startdate" onchange="validateDate()">
+                            <span class="text-danger fs-6 fw-bolder" id="startdateTypeError"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="@Model.BookCar.EndDate" class="mb-3 fs-5 fw-bolder "></label>
+                            <input asp-for="@Model.BookCar.EndDate" type="date" class="form-control mb-3" id="enddate" onchange="validateDate()">
+                        </div>
+                    </div>
+                    <div class="form-group" id="allAvailableCar">
+                        <div class="d-flex"><p class="fs-5 fw-bolder">Available Cars</p>
+                            <span class="text-danger fs-5 fw-bolder mx-3" id="bookedCarNumberError"></span>
+                        </div>
+                        
+                        <partial name="_AvailableCarForm" />
+                        
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+
+        <div class="modal-footer d-flex justify-content-center back-color">
+            <button type="button" class="btn btn-primary mt-2" id="confirmInsertButton">Book</button>
+            <button type="button" class="btn btn-secondary mt-2" data-dismiss="modal" id="cancelInsertButton">Cancel</button>
+        </div>
+
+    </div>
+</div>
+
+
+ @section scripts {
+    <script src="~/js/home.js"></script>
+}  

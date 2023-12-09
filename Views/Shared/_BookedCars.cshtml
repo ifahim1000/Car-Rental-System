@@ -1,0 +1,9 @@
+﻿@model IEnumerable< Car_Rental_System.Models.Car>
+
+@foreach(var car in Model)
+{
+    <div class="row">
+        <div class="col text-center mb-3">@car.ModelYear</div>
+        <div class="col text-center mb-3">@car.NumberPlate</div>
+    </div>
+}

@@ -1,0 +1,65 @@
+﻿@model Car_Rental_System.ViewModel.HomeViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+ <div style="height:820px">
+    <div class="bg-image text-center rounded ">
+        <p class="fs-2 text-center fw-bold text-black d-flex  align-items-center justify-content-center mb-0">Our Vehicles</p>
+    </div>
+    <div class="back-color p-3 overflow-auto" style="height:792px;">
+        <div class="row justify-content-around">
+            @foreach(var vehicle in Model.Vehicles)
+            {
+                <div class="card m-3 p-0" style="width: 15rem; height: 23rem">
+
+                    @{
+                        var base64 = Convert.ToBase64String(new BinaryReader(vehicle.VehicleImage.OpenReadStream()).ReadBytes((int)vehicle.VehicleImage.Length));
+                    }
+                    <img src="data:@vehicle.VehicleImage.ContentType;base64,@base64" alt="@vehicle.VehicleModelName" class="card-img-top" style="height: 165px">
+                    <div class="card-body">
+                        <h5 class="card-title">@vehicle.BrandName   @vehicle.VehicleModelName</h5>
+                        <p class="card-text mb-3">
+                            <i class="fa fa-user-circle mx-1" aria-hidden="true"></i>  @vehicle.VehicleCapacity People<br />
+                            <i class="fa fa-car mx-1" aria-hidden="true"></i> @vehicle.CategoryName<br />
+                            @if (vehicle.TotalQuantity > 0)
+                            {
+                                <div class="text-success" ><i class="fa fa-check-square mx-1" aria-hidden="true"></i> @vehicle.TotalQuantity Available</div>
+                            }
+                            @if (vehicle.TotalQuantity == 0)
+                            {
+                                <div class="text-danger"><i class="fa fa-times mx-1" aria-hidden="true"></i> Not Available</div>
+                            }
+                        </p>
+                        @if (vehicle.TotalQuantity > 0)
+                        {
+                            <div class="d-flex justify-content-center align-items-center">
+                                <button class="btn btn-primary book-car" data-vehicle-id="@vehicle.VehicleId">Book Now</button>
+                            </div>
+                        }
+                        @if(vehicle.TotalQuantity == 0)
+                        {
+                            <div class="d-flex justify-content-center align-items-center">
+                                <button class="btn btn-primary book-car disabled" data-vehicle-id="@vehicle.VehicleId">Book Now</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+        </div>
+     </div>
+</div>
+<!-- Create Modal -->
+<div class="modal fade  bd-example-modal-lg" id="bookVehicle" tabindex="-1" role="dialog" aria-labelledby="bookVehicleModalLabel" aria-hidden="true">
+    <div id="bookingFormContainer"></div>
+</div>
+
+
+@section styles {
+    <link rel="stylesheet" href="@Url.Content("~/css/Settings.css")" asp-append-version="true" type="text/css" />
+    <link href="~/css/settings.css" rel="stylesheet" />
+}
+@section scripts {
+    <script src="~/js/home.js"></script>
+} 

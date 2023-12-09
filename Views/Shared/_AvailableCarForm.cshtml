@@ -1,0 +1,16 @@
+﻿@model Car_Rental_System.ViewModel.HomeViewModel
+
+@foreach (var item in Model.CarsSortedOnModelYear)
+{
+    <div class="availableCarInfo mb-3">
+
+        <p class="fw-bold">Car Model: @item.Key</p>
+        <div class="carsPlate">
+            @foreach (var car in item.Value)
+            {
+                <button data-car-id="@car.CarId" type="button" class="btn btn-primary m-2 toggle-color" style="width: 170px">@car.NumberPlate</button>
+            }
+        </div>
+
+    </div>
+}

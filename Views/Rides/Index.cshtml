@@ -1,0 +1,223 @@
+﻿@model Car_Rental_System.ViewModel.RidesViewModel
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor accessor
+@{
+    int? userId = accessor.HttpContext.Session.GetInt32("userId");
+    int? userType = accessor.HttpContext.Session.GetInt32("userType");
+    string? userName = accessor.HttpContext.Session.GetString("userName");
+}
+@{
+    ViewData["Title"] = "Rides Page";
+}
+
+@if (userType == 1) //Type Admin
+{
+    <div style="height:820px">
+        <div class="bg-image text-center rounded ">
+            <p class="fs-2 text-center fw-bold text-black d-flex  align-items-center justify-content-center mb-0">All Rides</p>
+        </div>
+        <div class="back-color p-5" style="height:792px;">
+            <div class="overflow-auto" style="height:700px">
+                 <table class="table" id="allridesTable">
+                    <thead class="navbar-sticky">
+                        <tr class="justify-content-center">
+
+                            <th class="text-center">User Name<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                            <th class="text-center">Category Type<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                            <th class="text-center">Brand<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                            <th class="text-center">Model<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                            <th class="text-center">Start Date<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                            <th class="text-center">End Date<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                            <th class="text-center">Vehicle Booked<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                       @foreach (var booking in Model.AllBooking)
+                       {
+                            <tr>
+                                <td class="text-center">@booking.UserName</td>
+                                <td class="text-center">@booking.CategoryType </td>
+                                <td class="text-center">@booking.BrandName</td>
+                                <td class="text-center">@booking.VehicleModelName</td>
+                                <td class="text-center">@booking.StartDate.ToString("dd/MM/yyyy")</td>
+                                <td class="text-center">@booking.EndDate.ToString("dd/MM/yyyy")</td>
+                                <td class="text-center">
+                                    <div data-booking-id="@booking.BookingId" id="bookedVehicle">
+                                        @booking.VehicleQuantity <i class="fa fa-info-circle text-warning" aria-hidden="true"></i>
+                                    </div>
+                                </td>
+                                @if (booking.StartDate > DateTime.Now)
+                                {
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center">
+                                            <button data-booking-id="@booking.BookingId" class="btn btn-danger delete-booking">Delete</button>
+                                        </div>
+                                    </td>
+                                }
+                                @if(booking.EndDate<DateTime.Now)
+                                {
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center">
+                                            <button data-booking-id="@booking.BookingId" class="btn btn-success">Completed</button>
+                                        </div>
+                                    </td>
+                                }
+                                @if (booking.StartDate <= DateTime.Now && booking.EndDate >= DateTime.Now)
+                                {
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center">
+                                            <button class="btn btn-info mx-2 text-white">In Use</button>
+                                            <button data-booking-id="@booking.BookingId" class="btn btn-danger delete-booking">Delete</button>
+                                        </div>
+                                    </td>
+                                }
+
+                            </tr>
+                        }
+                    </tbody>
+                </table> 
+            </div>
+        </div>
+    </div>
+   
+
+}
+
+@if (userType == 2) //Type User
+{
+    <div style="height:820px">
+        <div class="bg-image text-center rounded ">
+            <p class="fs-2 text-center fw-bold text-black d-flex  align-items-center justify-content-center mb-0">My Rides</p>
+        </div>
+        <div class="back-color p-5" style="height:792px;">
+            <div class="overflow-auto" style="height:700px">
+                 <table class="table">
+                    <thead class="navbar-sticky">
+                        <tr class="justify-content-center">
+
+                            <th class="text-center">Category Type<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                            <th class="text-center">Brand<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                            <th class="text-center">Model<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                            <th class="text-center">Start Date<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                            <th class="text-center">End Date<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                            <th class="text-center">Vehicle Booked<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var booking in Model.MyBooking)
+                        {
+                            <tr>
+                                <td class="text-center">@booking.CategoryType </td>
+                                <td class="text-center">@booking.BrandName</td>
+                                <td class="text-center">@booking.VehicleModelName</td>
+                                <td class="text-center">@booking.StartDate.ToString("dd/MM/yyyy")</td>
+                                <td class="text-center">@booking.EndDate.ToString("dd/MM/yyyy")</td>
+                                <td class="text-center">
+                                    <div data-booking-id="@booking.BookingId" id="bookedVehicle">
+                                        @booking.VehicleQuantity <i class="fa fa-info-circle text-warning" aria-hidden="true"></i>
+                                    </div>
+                                </td>
+                                @if (booking.StartDate > DateTime.Now)
+                                {
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center">
+                                            <button data-booking-id="@booking.BookingId" class="btn btn-danger delete-booking">Cancel Ride</button>
+                                        </div>
+                                    </td>
+                                }
+                                @if(booking.EndDate<DateTime.Now)
+                                {
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center">
+                                            <button data-booking-id="@booking.BookingId" class="btn btn-success">Completed</button>
+                                        </div>
+                                    </td>
+                                }
+                     
+                               @if(booking.StartDate<= DateTime.Now && booking.EndDate >= DateTime.Now)
+                                {
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center">
+                                            <button data-booking-id="@booking.BookingId" class="btn btn-warning terminate-booking">Return Now</button>
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+
+                    </tbody>
+                </table> 
+            </div>
+        </div>
+    </div>
+
+}
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Deletion</h5>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to cancel this booking?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelDeleteButton">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteButton">Cancel Ride</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Return Modal -->
+<div class="modal fade" id="returnConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="returnConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="returnConfirmationModalLabel">Confirm Return</h5>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to return vehicles now?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelReturnButton">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmReturnButton">Return</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Details -->
+<div class="modal fade  bd-example-modal-lg" id="bookedCarModal" tabindex="-1" role="dialog" aria-labelledby="detailsVehicleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center bg-image ">
+                <h5 class="modal-title" id="addShowModalLabel align-text-center">Booked Cars</h5>
+            </div>
+            <div class="modal-body overflow-auto" style="max-height:820px">
+                <div class="back-color">
+                    <div class="row">
+                        <div class="col text-center fw-bold mb-3">Model Year</div>
+                        <div class="col text-center fw-bold mb-3">Car Number Plate</div>
+                    </div>
+                    <div id="detailsModal">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section styles {
+    <link rel="stylesheet" href="@Url.Content("~/css/Settings.css")" asp-append-version="true" type="text/css" />
+    <link href="~/css/settings.css" rel="stylesheet" />
+}
+@section scripts {
+    <script src="~/js/rides.js"></script>
+}

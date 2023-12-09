@@ -1,0 +1,120 @@
+﻿@model Car_Rental_System.ViewModel.VehicleModelViewModel
+@{
+    ViewData["Title"] = "Model Page";
+}
+<div style="height:820px">
+    <div class="bg-image rounded">
+        <div class="d-flex justify-content-between mx-5">
+            <p class="fs-2 fw-bold text-white d-flex align-items-center my-auto">Model</p>
+            <button class="btn btn-warning my-auto  fs-5 fw-bold " id="addVehicleModelButton"><i class="fa fa-plus"></i> | Add Model</button>
+
+        </div>
+    </div>
+    <div class="back-color p-5" style="height:792px;">
+        <div class="overflow-auto" style="height:700px">
+
+            <table class="table" id="modelTable">
+                <thead class="navbar-sticky">
+                    <tr class="justify-content-center">
+                        <th class="text-center">Category Type<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                        <th class="text-center">Brand Name<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                        <th class="text-center">Model Name<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                     @foreach (var vehicleModel in Model.VehicleModels)
+                    {
+                        <tr>
+                            <td class="text-center">@vehicleModel.CategoryName</td>
+                            <td class="text-center">@vehicleModel.BrandName</td>
+                            <td class="text-center">@vehicleModel.VehicleModelName</td>
+
+                            <td class="d-flex justify-content-center">
+                                <button data-vehicleModel-id="@vehicleModel.VehicleModelId" class="btn btn-primary edit-vehicleModel" style="margin-right: 20px">Edit</button>
+                                <button data-vehicleModel-id="@vehicleModel.VehicleModelId" class="btn btn-danger delete-vehicleModel">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Deletion</h5>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this Model?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelDeleteButton">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteButton">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Modal -->
+<div class="modal fade  bd-example-modal-lg" id="addVehicleModel" tabindex="-1" role="dialog" aria-labelledby="addBrandModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center bg-image fs-5 fw-bolder">
+                <h5 class="modal-title" id="addVehicleModelModalLabel align-text-center ">Add Model</h5>
+
+            </div>
+            <div class="modal-body">
+                <div class="back-color">
+                    <form class="p-5">
+                        <div class="form-group mb-2">
+                            <label asp-for="@Model.VehicleModelObject.CategoryName" class="mb-3 fs-5 fw-bolder"></label>
+                            <select asp-for="@Model.VehicleModelObject.CategoryId" class="form-control" id="selectedCategory" onchange="GetBrand()">
+                                <option value="">--Please Select Car Category--</option>
+                                @foreach (var category in Model.Categories)
+                                {
+                                    <option value="@category.CategoryId">@category.CategoryType</option>
+                                }
+                            </select>
+                            <span class="text-danger fs-6 fw-bolder" id="categoryTypeError"></span>
+
+                        </div>
+                        <div class="form-group mb-2">
+                            <label asp-for="@Model.VehicleModelObject.BrandName" class="mb-3 fs-5 fw-bolder"></label>
+                            <select asp-for="@Model.VehicleModelObject.BrandId" class="form-control" id="selectedBrand" onchange="validateBrand(this)">
+                                <option value="">--Please Select Car Brand--</option>
+                                
+                            </select>
+                           <span class="text-danger fs-6 fw-bolder" id="vehicleBrandTypeError"></span>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label asp-for="@Model.VehicleModelObject.VehicleModelName" class="mb-3 fs-5 fw-bolder"></label>
+                            <input asp-for="@Model.VehicleModelObject.VehicleModelName" class="form-control" id="vehicleModel" oninput="validateVehicleModel(this)" />
+                            <span class="text-danger fs-6 fw-bolder" id="vehicleModelTypeError"></span>
+                        </div>
+                        <button type="button" class="btn btn-primary" id="confirmInsertButton">Add </button>
+                        <button type="button" class="btn btn-primary" id="confirmEditButton">Save Changes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelInsertButton">Cancel</button>
+
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div> 
+
+@section styles {
+    <link rel="stylesheet" href="@Url.Content("~/css/Settings.css")" asp-append-version="true" type="text/css" />
+    <link href="~/css/settings.css" rel="stylesheet" />
+}
+@section scripts {
+    <script src="~/js/vehicleModel.js"></script>
+}

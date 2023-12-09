@@ -1,0 +1,18 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor accessor
+@{
+    int? userId = accessor.HttpContext.Session.GetInt32("userId");
+    int? userType = accessor.HttpContext.Session.GetInt32("userType");
+    string? userName = accessor.HttpContext.Session.GetString("userName");
+}@{
+    ViewData["Title"] = "Privacy Policy";
+}
+<h1>@ViewData["Title"]</h1>
+ @if (userType == 2) //Type User
+{
+    <p>Use this page to detail your site's privacy policy.</p>
+}
+@if(userType == 1)
+{
+    <p>Use this page to detail your site's privacy policy.Admin</p>
+}

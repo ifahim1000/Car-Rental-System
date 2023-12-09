@@ -1,0 +1,211 @@
+﻿@model Car_Rental_System.ViewModel.VehicleViewModel
+@{
+    ViewData["Title"] = "Vehicle Page";
+}
+<div style="height:820px">
+    <div class="bg-image rounded">
+        <div class="d-flex justify-content-between mx-5">
+            <p class="fs-2 fw-bold text-white d-flex align-items-center my-auto">Vehicle</p>
+            <button class="btn btn-warning my-auto  fs-5 fw-bold " id="addVehicleButton"><i class="fa fa-plus"></i> | Add Vehicle</button>
+
+        </div>
+    </div>
+    <div class="back-color p-5" style="height:792px;">
+        <div class="overflow-auto" style="height:700px">
+
+            <table class="table" id="vehicleTable">
+                <thead class="navbar-sticky">
+                    <tr class="justify-content-center">
+                        <th class="text-center">Vehicle Picture</th>
+                        <th class="text-center">Category Type<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                        <th class="text-center">Brand<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                        <th class="text-center">Model<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                        <th class="text-center">Vehicle Capacity<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                        <th class="text-center">Total Quantity<i class="fa fa-sort mx-3 sortIcon asc" aria-hidden="true"></i></th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach(var vehicle in Model.Vehicles)
+                    {
+                    <tr>
+                        <td class="text-center p-0" >
+
+                            @{
+                                    var base64 = Convert.ToBase64String(new BinaryReader(vehicle.VehicleImage.OpenReadStream()).ReadBytes((int)vehicle.VehicleImage.Length));
+                            }
+
+                                <img src="data:@vehicle.VehicleImage.ContentType;base64,@base64" alt="@vehicle.VehicleModelName" class="img-fluid" style="width: 150px; height:100px">
+                        </td>
+                        <td class="text-center">@vehicle.CategoryName</td>
+                        <td class="text-center">@vehicle.BrandName </td>
+                        <td class="text-center">@vehicle.VehicleModelName</td>
+                        <td class="text-center">@vehicle.VehicleCapacity</td>
+                        <td class="text-center">
+                                <div data-vehicle-id="@vehicle.VehicleId" id="totalVehicle">
+                                    @vehicle.TotalQuantity <i class="fa fa-info-circle text-warning" aria-hidden="true"></i>
+                                </div>
+                        </td>
+
+                        <td class="text-center">
+                                <div class="d-flex justify-content-center">
+                                    <button data-vehicle-id="@vehicle.VehicleId" class="btn btn-primary edit-vehicle" style="margin-right: 20px">Edit</button>
+                                    <button data-vehicle-id="@vehicle.VehicleId" class="btn btn-danger delete-vehicle">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Deletion</h5>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this Vehicle?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelDeleteButton">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteButton">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Create Modal -->
+<div class="modal fade  bd-example-modal-lg" id="addVehicle" tabindex="-1" role="dialog" aria-labelledby="addVehicleModalLabel" aria-hidden="true" >
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center bg-image fs-5 fw-bolder">
+                <h5 class="modal-title" id="addVehicleModalLabel align-text-center ">Add Vehicle</h5>
+
+            </div>
+            <div class="modal-body overflow-auto" style="max-height:750px">
+                <div class="back-color">
+                    <form class="px-5 pt-5">
+                        <div class="form-group mb-3">
+                            <label asp-for="@Model.Transport.CategoryName" class="mb-3 fs-5 fw-bolder"></label>
+                            <select asp-for="@Model.Transport.CategoryId" class="form-control" id="selectedCategory" onchange="GetBrand()">
+                                <option value="">--Please Select Car Category--</option>
+                                @foreach (var category in Model.Categories)
+                                {
+                                    <option value="@category.CategoryId">@category.CategoryType</option>
+                                }
+                            </select>
+                            <span class="text-danger fs-6 fw-bolder" id="categoryTypeError"></span>
+
+                        </div>
+                        <div class="form-row d-flex justify-content-between mb-3">
+                            <div class="form-group col-md-6" style="margin-right : 20px;">
+                                <label asp-for="@Model.Transport.BrandName" class="mb-3 fs-5 fw-bolder"></label>
+                                <select asp-for="@Model.Transport.BrandId" class="form-control" id="selectedBrand" onchange="GetVehicleModel()">
+                                    <option value="">--Please Select Car Brand--</option>
+                                </select>
+                                <span class="text-danger fs-6 fw-bolder" id="vehicleBrandTypeError"></span>
+
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label asp-for="@Model.Transport.VehicleModelName" class="mb-3 fs-5 fw-bolder"></label>
+                                <select asp-for="@Model.Transport.VehicleModelId" class="form-control" id="selectedVehicleModel" onchange="validateVehicleModel()">
+                                    <option value="">--Please Select Car Model--</option>
+
+                                </select>
+                                <span class="text-danger fs-6 fw-bolder" id="vehicleModelTypeError"></span>
+
+                            </div>
+                        </div>
+                        <div class="form-row d-flex justify-content-between mb-3">
+                            <div class="form-group col-md-6" style="margin-right : 20px;">
+                                <label asp-for="@Model.Transport.VehicleCapacity" class="mb-3 fs-5 fw-bolder"></label>
+                                <input asp-for="@Model.Transport.VehicleCapacity" type="number" class="form-control mb-2" id="vehicleCapacity" min="1" max="50" oninput="validateCapacity(this)" />
+                                <span class="text-danger fs-6 fw-bolder" id="vehicleCapacityTypeError"></span>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label asp-for="@Model.Transport.TotalQuantity" class="mb-3 fs-5 fw-bolder"></label>
+                                <input asp-for="@Model.Transport.TotalQuantity" class="form-control mb-2" type="number" id="totalQuantity" min="1" max="10" oninput="validateTotalQuantity(this)" />
+                                <span class="text-danger fs-6 fw-bolder" id="totalQuantityTypeError"></span>
+                            </div>
+                        </div>
+                        
+                        <div id="showCarQuantityFields">
+                            <div  class="d-flex justify-content-between">
+                             <p class="fs-5 fw-bolder"> Model Year and Car Number</p>
+                                <button type="button" class="btn btn-success btn-sm" style="height: 35px" id="editCarAddButton"> Add More Car</button>
+                            </div>
+                            <div id="formContainer">
+                               
+                            </div>
+                        </div> 
+                        <div class="form-group mb-3">
+                            <label asp-for="@Model.Transport.VehicleImage" class="mb-3 fs-5 fw-bolder"></label>
+                            <input asp-for="@Model.Transport.VehicleImage" type="file" accept="image/*" class="form-control" id="vehicleImage" onchange="loadFile(event)" />
+                            <div id="vehicleImageEdit">
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                      <div class="input-group-text">Choose File</div>
+                                    </div>
+                                    <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="">
+                                </div>
+                            </div>
+                            <img id="output" class="pt-5" />
+                            <span class="text-danger fs-6 fw-bolder" id="vehicleImageTypeError"></span>
+                        </div>
+                       
+                       
+
+                    </form>
+                </div>
+            </div>
+
+            <div class="modal-footer d-flex justify-content-center back-color">
+                <button type="button" class="btn btn-primary" id="confirmInsertButton">Add </button>
+                <button type="button" class="btn btn-primary" id="confirmEditButton">Save Changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelInsertButton">Cancel</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Details -->
+<div class="modal fade  bd-example-modal-lg" id="detailsVehicleModal" tabindex="-1" role="dialog" aria-labelledby="detailsVehicleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center bg-image ">
+                <h5 class="modal-title" id="addShowModalLabel align-text-center">Details Vehicle</h5>
+            </div>
+            <div class="modal-body overflow-auto" style="max-height:820px">
+                <div class="back-color" >
+                    <div class="row">
+                        <div class="col text-center fw-bold mb-3">Model Year</div>
+                        <div class="col text-center fw-bold mb-3">Car Number Plate</div>
+                    </div>
+                    <div id="detailsModal">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section styles {
+    <link rel="stylesheet" href="@Url.Content("~/css/Settings.css")" asp-append-version="true" type="text/css" />
+    <link href="~/css/settings.css" rel="stylesheet" />
+}
+@section scripts {
+    <script src="~/js/vehicle.js"></script>
+}

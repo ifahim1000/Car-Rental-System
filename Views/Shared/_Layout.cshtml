@@ -1,0 +1,165 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor accessor
+@{
+    int? userId = accessor.HttpContext.Session.GetInt32("userId");
+    int? userType = accessor.HttpContext.Session.GetInt32("userType");
+    string? userName = accessor.HttpContext.Session.GetString("userName");
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Car Rental</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    @RenderSection("styles",false)
+
+
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <a class="nav-link menu-item text-white" id="home"  asp-controller="Home" asp-action="Index">Home</a>
+                <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        
+                        @if (userType == 2) //Type User
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link menu-item text-white" id="myrides" asp-controller="Rides" asp-action="Index">My Rides</a>
+                            </li>
+                        }
+                        @if (userType == 1) //Type Admin
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link menu-item text-white" id="allrides" asp-controller="Rides" asp-action="Index">All Rides</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link menu-item text-white" id="toggleLink">
+                                    Settings<i class="fa fa-angle-down fs-8"></i>
+                                </a>
+
+                                <div class="dropdown-menu" id="navbarDropdown">
+                                    <a class="dropdown-item" asp-controller="Settings" asp-action="Category">Category</a>
+                                    <a class="dropdown-item" asp-controller="Settings" asp-action="Brand">Brand</a>
+                                    <a class="dropdown-item" asp-controller="Settings" asp-action="VehicleModel">Model</a>
+                                    <a class="dropdown-item" asp-controller="Settings" asp-action="Vehicle">Vehicle</a>
+                                </div>
+                            
+
+                            </li>
+                        }
+                        
+                    </ul>
+                    @if (userType == null) // Type Visitor
+                    {
+                        <div class="d-flex" id="loginSignUpSection">
+                            <button class="btn btn-primary" id="signUpButton" type="button">Sign Up</button>
+                            <button class="btn btn-success mx-4" id="logInButton" type="button">Log In</button>
+                        </div>
+                    }
+                    @if (userType == 2 || userType == 1)
+                    {
+                        <div class="d-flex">
+                            <p class="text-white my-auto fw-bold">Hello @userName !!</p>
+                            <button class="btn btn-success mx-4" id="logOutButton" type="button">Log out</button>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container-fluid p-0">
+        <main role="main" class="pb-3">
+            <!-- Log In Modal -->
+            <div class="modal fade " id="logInModal" tabindex="-1" role="dialog" aria-labelledby="logInModal" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content ">
+                        <div class="modal-header justify-content-center bg-dark text-white">
+                            <h5 class="modal-title" id="logInModal align-text-center ">Log In</h5>
+                        </div>
+                        <div class="modal-body  mx-auto" style="width: 28rem;">
+                            <form>
+                                <div class="form-group">
+                                    <label class="mb-3 fw-bold">User Name</label>
+                                    <input type="text" class="form-control mb-2 border-1" id="userName" oninput="validateUserName(this)">
+                                    <span class="text-danger fs-6 fw-bolder" id="userNameError"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="mb-3 fw-bold">Password</label>
+                                    <input type="password" class="form-control mb-2 border-1" id="inputPassword" oninput="validatePassword(this)">
+                                    <span class="text-danger fs-6 fw-bolder" id="inputPasswordError"></span>
+                                </div>
+                                <div class="form-group d-flex justify-content-center align-items-center mb-3">
+                                    <small>Not a member? <a href="#" id="registrationLink"> Register</a></small>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <button type="button" class="btn btn-secondary mx-3" id="signInCancel">Cancel</button>
+                                    <button type="button" class="btn btn-primary" id="signIn">Sign In</button>
+                                   
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Sign Up Modal -->
+            <div class="modal fade " id="signUpModal" tabindex="-1" role="dialog" aria-labelledby="signUpModal" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content ">
+                        <div class="modal-header justify-content-center bg-dark text-white">
+                            <h5 class="modal-title" id="signUpModal align-text-center ">Sign Up</h5>
+                        </div>
+                        <div class="modal-body  mx-auto" style="width: 28rem;">
+                            <form >
+                                <div class="form-group">
+                                    <label class="mb-3 fw-bold">User Name</label>
+                                    <input type="text" class="form-control mb-2 border-1" id="sinUpUserName" oninput="validateUserName(this)" placeholder="John Doe" required>
+                                    <span class="text-danger fs-6 fw-bolder" id="signUpErrorUserName"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="mb-3 fw-bold">Mobile Number</label>
+                                    <input type="text" class="form-control mb-2 border-1" id="signUpMobileNumber" oninput="validateMobile(this)" required>
+                                    <span class="text-danger fs-6 fw-bolder" id="signUpErrorMobileNumber"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="mb-3 fw-bold">Password</label>
+                                    <input type="password" class="form-control mb-2 border-1" id="signUpInputPassword" oninput="validatePassword(this)" placeholder="Atmost 6 characters" required>
+                                    <span class="text-danger fs-6 fw-bolder" id="signUpErrorInputPassword"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="mb-3 fw-bold">Retype Password</label>
+                                    <input type="password" class="form-control mb-2 border-1" id="signUpRetypePassword" required>
+                                    <span class="text-danger fs-6 fw-bolder" id="signUpErrorRetypePassword"></span>
+                                </div>
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <button type="button" class="btn btn-secondary mx-3" id="registerCancel">Cancel</button>
+                                    <button type="button" class="btn btn-primary" id="register">Register</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @RenderBody()
+        </main>
+    </div>
+
+   
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+   
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
